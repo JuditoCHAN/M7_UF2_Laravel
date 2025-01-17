@@ -16,7 +16,7 @@ class ValidateYear
      */
     public function handle(Request $request, Closure $next)
     {
-        $year = $request->route('year');
+        $year = $request->route('year'); //obtiene el parametro de la ruta
 
         // in case year is not numeric go to homepage
         if(isset($year)){
