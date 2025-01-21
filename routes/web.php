@@ -30,4 +30,4 @@ Route::middleware('year')->group(function() {
     });
 });
 
-
+Route::get('sortFilms', [FilmController::class, "sortFilms"])->name('sortFilms');
