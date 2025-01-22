@@ -11,7 +11,7 @@ class FilmController extends Controller
      */
     public static function readFilms(): array {
         $films = Storage::json('/public/films.json');
-        return $films;
+        return isset($films) ? $films : [];
     }
     /**
      * List films older than input year 
@@ -136,5 +136,15 @@ class FilmController extends Controller
         });
 
         return view("films.list", ["films" => $films, "title" => $title]);
+    }
+
+
+    public function countFilms() {
+        $title = "Número total de películas";
+        $films = FilmController::readFilms();
+
+        $numFilms = count($films);
+        
+        return view("films.count", ["title" => $title, "numFilms" => $numFilms]);
     }
 }
