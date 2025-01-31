@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class FilmController extends Controller
 {
@@ -146,5 +147,45 @@ class FilmController extends Controller
         $numFilms = count($films);
         
         return view("films.count", ["title" => $title, "numFilms" => $numFilms]);
+    }
+
+
+    public static function isFilm($filmName): bool {
+        $films = FilmController::readFilms();
+        
+        foreach($films as $film) {
+            if($film['name'] === $filmName) { //si ya hay una peli con ese nombre
+                return true;
+            }
+        }
+        return false; //no hay pelis con ese nombre
+    }
+
+
+    public function createFilm(Request $request) {
+        $films = FilmController::readFilms();
+
+        $newFilm = 
+        ['name' => $request->input("name"),
+        'year' => $request->input("year"),
+        'genre' => $request->input("genre"),
+        'country' => $request->input("country"),
+        'duration' => $request->input("duration"),
+        'img_url' => $request->input("img_url")
+        ];
+
+        if(FilmController::isFilm($newFilm['name'])) { //si ya existe con ese nombre
+            return view("welcome", ["status" => "Ya existe una peli con ese nombre"]);
+        } else {
+            //añadimos la peli y mostramos todas las pelis
+            $films[] = $newFilm;
+            $status = Storage::put('/public/films.json', json_encode($films));
+
+            if($status) {
+                return redirect()->action('App\Http\Controllers\FilmController@listFilms');
+            } else {
+                return view("welcome", ["status" => "Error al añadir la peli"]);
+            }
+        }
     }
 }
