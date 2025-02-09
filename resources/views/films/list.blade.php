@@ -1,29 +1,39 @@
-<h1>{{$title}}</h1>
+@extends('layouts.master')
 
-@if(empty($films))
-    <FONT COLOR="red">No se ha encontrado ninguna película</FONT>
-@else
-    <div align="center">
-    <table border="1">
-        <tr>
-            @foreach($films as $film)
-                @foreach(array_keys($film) as $key)
-                    <th>{{$key}}</th>
-                @endforeach
-                @break
-            @endforeach
-        </tr>
+@section('title', 'Listado de peliculas')
 
-        @foreach($films as $film)
+@section('header')
+    @parent()
+@endsection
+
+@section('content')
+    <h1>{{$title}}</h1>
+
+    @if(empty($films))
+        <FONT COLOR="red">No se ha encontrado ninguna película</FONT>
+    @else
+        <div align="center">
+        <table border="1">
             <tr>
-                <td>{{$film['name']}}</td>
-                <td>{{$film['year']}}</td>
-                <td>{{$film['genre']}}</td>
-                <td>{{$film['country']}}</td>
-                <td>{{$film['duration']}}</td>
-                <td><img src={{$film['img_url']}} style="width: 100px; heigth: 120px;" /></td>
+                @foreach($films as $film)
+                    @foreach(array_keys($film) as $key)
+                        <th>{{$key}}</th>
+                    @endforeach
+                    @break
+                @endforeach
             </tr>
-        @endforeach
-    </table>
-</div>
-@endif
+
+            @foreach($films as $film)
+                <tr>
+                    <td>{{$film['name']}}</td>
+                    <td>{{$film['year']}}</td>
+                    <td>{{$film['genre']}}</td>
+                    <td>{{$film['country']}}</td>
+                    <td>{{$film['duration']}}</td>
+                    <td><img src={{$film['img_url']}} style="width: 100px; heigth: 120px;" /></td>
+                </tr>
+            @endforeach
+        </table>
+    </div>
+    @endif
+@endsection
