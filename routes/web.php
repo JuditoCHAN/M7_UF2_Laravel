@@ -3,6 +3,8 @@
 use App\Http\Controllers\FilmController;
 use App\Http\Middleware\ValidateYear;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +38,15 @@ Route::middleware('url')->group(function() {
     Route::group(['prefix' => 'filmin'], function() {
         Route::post('createFilm', [FilmController::class, "createFilm"])->name("createFilm");
     });
+});
+
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getPdo();
+        return "Conexión exitosa con la base de datos.";
+    } catch (\Exception $e) {
+        return "Error al conectar a la base de datos: " . $e->getMessage();
+    }
 });
 
 
