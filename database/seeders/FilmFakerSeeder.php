@@ -18,6 +18,8 @@ class FilmFakerSeeder extends Seeder
 
         $genres = ['thriller', 'action', 'drama', 'love'];
 
+        //DB::table('films')->delete();
+
         foreach (range(1, 10) as $index) {
             DB::table('films')->insert([
                 'name' => $faker->sentence(3),
