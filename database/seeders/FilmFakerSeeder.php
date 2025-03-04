@@ -16,6 +16,13 @@ class FilmFakerSeeder extends Seeder
     {
         $faker = Faker::create();
 
+        // desactivar (temporalmente) las restricciones de claves foráneas para poder hacer truncate
+        //DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        // elimina los datos existentes en la tabla films:
+        // truncate elimina registros de la tabla y reinicia contador autoincremental
+        //DB::table('films')->truncate();
+
         $ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
         $genres = ['thriller', 'action', 'drama', 'love'];
 
