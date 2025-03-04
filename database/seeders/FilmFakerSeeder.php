@@ -16,9 +16,8 @@ class FilmFakerSeeder extends Seeder
     {
         $faker = Faker::create();
 
+        $ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
         $genres = ['thriller', 'action', 'drama', 'love'];
-
-        //DB::table('films')->delete();
 
         foreach (range(1, 10) as $index) {
             DB::table('films')->insert([
@@ -26,6 +25,7 @@ class FilmFakerSeeder extends Seeder
                 'year' => $faker->year,
                 'genre' => $faker->randomElement($genres),
                 'country' => $faker->country,
+                'rating' => $faker->randomElement($ratings),
                 'duration' => $faker->numberBetween(90, 180),
                 'img_url' => $faker->imageUrl(640, 480, 'movies'),
                 'created_at' => now(),
