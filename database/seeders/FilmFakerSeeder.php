@@ -17,12 +17,13 @@ class FilmFakerSeeder extends Seeder
         $faker = Faker::create();
 
         $ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+        $genres = ['thriller', 'action', 'drama', 'love'];
 
         foreach (range(1, 10) as $index) {
             DB::table('films')->insert([
                 'name' => $faker->sentence(3),
                 'year' => $faker->year,
-                'genre' => $faker->word,
+                'genre' => $faker->randomElement($genres),
                 'country' => $faker->country,
                 'rating' => $faker->randomElement($ratings),
                 'duration' => $faker->numberBetween(90, 180),
