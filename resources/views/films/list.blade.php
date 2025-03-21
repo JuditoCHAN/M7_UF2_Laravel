@@ -15,24 +15,25 @@
         <div align="center">
         <table border="1">
             <tr>
-                @foreach($films as $film)
-                    @foreach(array_keys($film) as $key)
-                        <th>{{$key}}</th>
+                @if(!empty($films))
+                    @foreach($films as $film)
+                        @foreach(array_keys($film) as $key)
+                            <th>{{$key}}</th>
+                        @endforeach
+                        @break
                     @endforeach
-                    @break
-                @endforeach
-            </tr>
 
-            @foreach($films as $film)
-                <tr>
-                    <td>{{$film['name']}}</td>
-                    <td>{{$film['year']}}</td>
-                    <td>{{$film['genre']}}</td>
-                    <td>{{$film['country']}}</td>
-                    <td>{{$film['duration']}}</td>
-                    <td><img src={{$film['img_url']}} style="width: 100px; heigth: 120px;" /></td>
-                </tr>
-            @endforeach
+                    @foreach($films as $film)
+                        <tr>
+                            <td>{{$film['name']}}</td>
+                            <td>{{$film['year']}}</td>
+                            <td>{{$film['genre']}}</td>
+                            <td>{{$film['country']}}</td>
+                            <td>{{$film['duration']}}</td>
+                            <td><img src={{$film['img_url']}} style="width: 100px; heigth: 120px;" /></td>
+                        </tr>
+                    @endforeach
+                @endif
         </table>
     </div>
     @endif

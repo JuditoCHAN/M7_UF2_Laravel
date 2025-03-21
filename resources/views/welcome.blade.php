@@ -13,7 +13,12 @@
         <li><a href=/filmout/newFilms>Pelis nuevas</a></li>
         <li><a href=/filmout/films>Pelis</a></li>
         <li><a href=/filmout/sortFilms>Pelis por año en orden descendiente</a></li>
-        <li><a href=/filmout/countFilms>Número total de pelis</a></li>
+        <li><a href=/filmout/countFilms>Contar películas</a></li>
+        <hr>
+        <li><a href=/actorout/actors>Listar actores</a></li>
+        <li><a href=/actorout/countActors>Contar actores</a></li>
+
+
     </ul>
 
     <br>

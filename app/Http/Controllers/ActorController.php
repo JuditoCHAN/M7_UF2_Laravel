@@ -5,31 +5,30 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class FilmController extends Controller
+class ActorController extends Controller
 {
 
     /**
      * Read films from storage
      */
-    public static function readFilms(): array {
-        // leemos los datos del fichero JSON
+    public static function readActors(): array {
         $films = Storage::json('/public/films.json');
-
-        // leemos los datos de la base de datos
         try {
             $filmsDB = DB::table('films')->get()->toArray(); // devuelve array de objetos stdClass
         } catch (\Exception $e) {
-            $filmsDB = [];
+            $filmsDB = null;
         }
 
+        $filmsDBInArray = null;
         // hay que convertir $filmsDB en un array asociativo
-        $filmsDBInArray = [];
-        foreach($filmsDB as $film) {
-            $filmsDBInArray[] = (array) $film;
+        if($filmsDB != null) {
+            foreach($filmsDB as $film) {
+                $filmsDBInArray[] = (array) $film;
+            }
         }
 
-        // combinamos los datos del fichero JSON con los de la base de datos
-        return array_merge($films ?? [], $filmsDBInArray); // si $films es null, devolvemos un array vacío combinado con $filmsDBInArray
+        // si no hay datos en la base de datos o no hay conexión, devolvemos solo los datos del fichero ($films)
+        return isset($films) && isset($filmsDBInArray) ? ($films + $filmsDBInArray) : $films;
     }
 
 
@@ -77,33 +76,41 @@ class FilmController extends Controller
 
 
     /**
-     * Lista TODAS las películas o filtra x año o categoría.
+     * Lista TODOS los actores o filtra x década.
      */
-    public function listFilms($year = null, $genre = null)
+    public function listActors($decade = null)
     {
-        $films_filtered = [];
-        $title = "Listado de todas las pelis";
-        $films = FilmController::readFilms();
-        //dd($films);
+        $title = "Listado de todos los actores";
+        try {
+            $actors = DB::table('actors')->get()->toArray(); // devuelve array de objetos stdClass
+        } catch (\Exception $e) {
+            $actors = [];
+        }
 
-        //if year and genre are null
-        if (is_null($year) && is_null($genre))
-            return view('films.list', ["films" => $films, "title" => $title]);
+        // hay que convertir $actors (array de stdClass) en un array asociativo
+        $actorsDBInArray = [];
+        foreach($actors as $actor) {
+            $actorsDBInArray[] = (array) $actor;
+        }
+
+        //if parameter decade is null
+        if (is_null($decade))
+            return view('actors.list', ["actors" => $actorsDBInArray, "title" => $title]);
 
         //list based on year or genre informed
-        foreach ($films as $film) {
-            if ((!is_null($year) && is_null($genre)) && $film['year'] == $year){
-                $title = "Listado de todas las pelis filtrado x año";
-                $films_filtered[] = $film;
-            }else if((is_null($year) && !is_null($genre)) && strtolower($film['genre']) == strtolower($genre)){
-                $title = "Listado de todas las pelis filtrado x categoria";
-                $films_filtered[] = $film;
-            }else if(!is_null($year) && !is_null($genre) && strtolower($film['genre']) == strtolower($genre) && $film['year'] == $year){
-                $title = "Listado de todas las pelis filtrado x categoria y año";
-                $films_filtered[] = $film;
-            }
-        }
-        return view("films.list", ["films" => $films_filtered, "title" => $title]);
+        // foreach ($films as $film) {
+        //     if ((!is_null($year) && is_null($genre)) && $film['year'] == $year){
+        //         $title = "Listado de todas las pelis filtrado x año";
+        //         $films_filtered[] = $film;
+        //     }else if((is_null($year) && !is_null($genre)) && strtolower($film['genre']) == strtolower($genre)){
+        //         $title = "Listado de todas las pelis filtrado x categoria";
+        //         $films_filtered[] = $film;
+        //     }else if(!is_null($year) && !is_null($genre) && strtolower($film['genre']) == strtolower($genre) && $film['year'] == $year){
+        //         $title = "Listado de todas las pelis filtrado x categoria y año";
+        //         $films_filtered[] = $film;
+        //     }
+        // }
+        // return view("films.list", ["films" => $films_filtered, "title" => $title]);
     }
 
 
@@ -160,13 +167,11 @@ class FilmController extends Controller
     }
 
 
-    public function countFilms() {
-        $title = "Número total de películas";
-        $films = FilmController::readFilms();
+    public function countActors() {
+        $title = "Número total de actores";
+        $numActors = DB::table('actors')->count();
 
-        $numFilms = count($films);
-
-        return view("films.count", ["title" => $title, "numFilms" => $numFilms]);
+        return view("actors.count", ["title" => $title, "numActors" => $numActors]);
     }
 
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActorController;
 use App\Http\Controllers\FilmController;
 use App\Http\Middleware\ValidateYear;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,13 @@ Route::get('/test-db', function () {
         return "Error al conectar a la base de datos: " . $e->getMessage();
     }
 });
+
+Route::group(['prefix' => 'actorout'], function() {
+    Route::get('countActors', [ActorController::class, "countActors"])->name("countActors");
+    Route::get('actors', [ActorController::class, 'listActors'])->name('listActors');
+});
+
+//Route::middleware('year')->group()
 
 
 
