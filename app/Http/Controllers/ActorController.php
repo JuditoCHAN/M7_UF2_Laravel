@@ -33,49 +33,6 @@ class ActorController extends Controller
 
 
     /**
-     * List films older than input year
-     * if year is not infomed 2000 year will be used as criteria
-     */
-    public function listOldFilms($year = null)
-    {
-        $old_films = [];
-        if (is_null($year))
-        $year = 2000;
-
-        $title = "Listado de Pelis Antiguas (Antes de $year)";
-        $films = FilmController::readFilms();
-
-        foreach ($films as $film) {
-        //foreach ($this->datasource as $film) {
-            if ($film['year'] < $year)
-                $old_films[] = $film;
-        }
-        return view('films.list', ["films" => $old_films, "title" => $title]);
-    }
-
-
-    /**
-     * List films younger than input year
-     * if year is not infomed 2000 year will be used as criteria
-     */
-    public function listNewFilms($year = null)
-    {
-        $new_films = [];
-        if (is_null($year))
-            $year = 2000;
-
-        $title = "Listado de Pelis Nuevas (Después de $year)";
-        $films = FilmController::readFilms();
-
-        foreach ($films as $film) {
-            if ($film['year'] >= $year)
-                $new_films[] = $film;
-        }
-        return view('films.list', ["films" => $new_films, "title" => $title]);
-    }
-
-
-    /**
      * Lista TODOS los actores o filtra x década.
      */
     public function listActors($decade = null)
@@ -93,83 +50,17 @@ class ActorController extends Controller
             $actorsDBInArray[] = (array) $actor;
         }
 
-        //if parameter decade is null
-        if (is_null($decade))
-            return view('actors.list', ["actors" => $actorsDBInArray, "title" => $title]);
-
-        //list based on year or genre informed
-        // foreach ($films as $film) {
-        //     if ((!is_null($year) && is_null($genre)) && $film['year'] == $year){
-        //         $title = "Listado de todas las pelis filtrado x año";
-        //         $films_filtered[] = $film;
-        //     }else if((is_null($year) && !is_null($genre)) && strtolower($film['genre']) == strtolower($genre)){
-        //         $title = "Listado de todas las pelis filtrado x categoria";
-        //         $films_filtered[] = $film;
-        //     }else if(!is_null($year) && !is_null($genre) && strtolower($film['genre']) == strtolower($genre) && $film['year'] == $year){
-        //         $title = "Listado de todas las pelis filtrado x categoria y año";
-        //         $films_filtered[] = $film;
-        //     }
-        // }
-        // return view("films.list", ["films" => $films_filtered, "title" => $title]);
-    }
-
-
-    public function listFilmsByGenre($genre = null) {
-        $films_filtered = [];
-        $title = "Listado de todas las pelis";
-        $films = FilmController::readFilms();
-
-        //if genre is null
-        if (is_null($genre))
-            return view('films.list', ["films" => $films, "title" => $title]);
-
-        //list based on genre
-        foreach ($films as $film) {
-            if (strtolower($film['genre']) == strtolower($genre)){
-                $title = "Listado de todas las pelis filtrado x categoria";
-                $films_filtered[] = $film;
-            }
-        }
-        return view("films.list", ["films" => $films_filtered, "title" => $title]);
-    }
-
-
-    public function listFilmsByYear($year = null) {
-        $films_filtered = [];
-
-        $title = "Listado de todas las pelis";
-        $films = FilmController::readFilms();
-
-        //if year is null
-        if (is_null($year))
-            return view('films.list', ["films" => $films, "title" => $title]);
-
-        //list based on year
-        foreach ($films as $film) {
-            if ($film['year'] == $year){
-                $title = "Listado de todas las pelis filtrado x año";
-                $films_filtered[] = $film;
-            }
-        }
-        return view("films.list", ["films" => $films_filtered, "title" => $title]);
-    }
-
-
-    public function sortFilms() {
-        $title = "Listado de todas las pelis en orden descendiente";
-        $films = FilmController::readFilms();
-
-        usort($films, function($a, $b) {
-            return $b['year'] - $a['year']; //si da positivo, es q el año de $b es mayor
-        });
-
-        return view("films.list", ["films" => $films, "title" => $title]);
+        return view('actors.list', ["actors" => $actorsDBInArray, "title" => $title]);
     }
 
 
     public function countActors() {
         $title = "Número total de actores";
-        $numActors = DB::table('actors')->count();
+        try {
+            $numActors = DB::table('actors')->count();
+        } catch (\Exception $e) {
+            $numActors = 0;
+        }
 
         return view("actors.count", ["title" => $title, "numActors" => $numActors]);
     }
@@ -228,6 +119,35 @@ class ActorController extends Controller
                     return view("welcome", ["status" => "Error al añadir la peli al fichero: " . $e->getMessage()]);
                 }
             }
+        }
+    }
+
+    public function listActorsByDecade($year = null) {
+        // si el parámetro $decade no está informado, devolvemos una vista que mostrará un mensaje
+        if (is_null($year)) {
+            $title = "Listado de actores";
+            return view('actors.list', ["actors" => [], "title" => $title]);
+        } else {
+            $title = "Listado de actores de la década de los " . $year;
+            $decadeStart = $year;
+            $decadeEnd = $year + 9;
+
+            try {
+                $actors = DB::table('actors')
+                ->whereBetween('birthdate', ["$decadeStart-01-01", "$decadeEnd-12-31"])
+                ->get()
+                ->toArray(); // devuelve array de objetos stdClass
+            } catch (\Exception $e) {
+                $actors = [];
+            }
+
+            // hay que convertir $actors (array de stdClass) en un array asociativo
+            $actorsDBInArray = [];
+            foreach($actors as $actor) {
+                $actorsDBInArray[] = (array) $actor;
+            }
+
+            return view('actors.list', ["actors" => $actorsDBInArray, "title" => $title]);
         }
     }
 }

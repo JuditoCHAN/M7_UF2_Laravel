@@ -10,7 +10,7 @@
     <h1>{{$title}}</h1>
 
     @if($numActors == 0)
-        <FONT COLOR="red">No se ha encontrado ninguna actor</FONT>
+        <FONT COLOR="red">No se ha encontrado ningún actor</FONT>
     @else
         <div>
             <p>Hay {{ $numActors }} actores registrados.</p>

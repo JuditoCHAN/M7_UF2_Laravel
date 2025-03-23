@@ -53,9 +53,11 @@ Route::get('/test-db', function () {
 Route::group(['prefix' => 'actorout'], function() {
     Route::get('countActors', [ActorController::class, "countActors"])->name("countActors");
     Route::get('actors', [ActorController::class, 'listActors'])->name('listActors');
-});
 
-//Route::middleware('year')->group()
+    Route::middleware('year')->group(function() {
+        Route::get('listActorsByDecade/{year?}', [ActorController::class, 'listActorsByDecade'])->name('listActorsByDecade');
+    });
+});
 
 
 

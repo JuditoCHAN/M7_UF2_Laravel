@@ -7,21 +7,16 @@
 @endsection
 
 @section('content')
-    <h1 class="mt-4">Lista de Peliculas</h1>
+    <h1 class="mt-4">Lista de películas</h1>
     <ul>
         <li><a href=/filmout/oldFilms>Pelis antiguas</a></li>
         <li><a href=/filmout/newFilms>Pelis nuevas</a></li>
         <li><a href=/filmout/films>Pelis</a></li>
         <li><a href=/filmout/sortFilms>Pelis por año en orden descendiente</a></li>
         <li><a href=/filmout/countFilms>Contar películas</a></li>
-        <hr>
-        <li><a href=/actorout/actors>Listar actores</a></li>
-        <li><a href=/actorout/countActors>Contar actores</a></li>
-
-
     </ul>
+    <hr>
 
-    <br>
     @if (!empty($status))
         <div class="alert alert-danger">
             {{ $status }}
@@ -45,10 +40,10 @@
             <div class="mb-3">
                 <label for="genre" class="form-label">Género: </label>
                 <select name="genre" id="genre" class="form-select" required>
-                    <option value="thriller">Thriller</options>
-                    <option value="action">Action</options>
-                    <option value="drama">Drama</options>
-                    <option value="love">Love</options>
+                    <option value="thriller">Thriller</option>
+                    <option value="action">Action</option>
+                    <option value="drama">Drama</option>
+                    <option value="love">Love</option>
                 </select>
             </div>
 
@@ -68,6 +63,31 @@
             </div>
 
             <button type="submit" class="btn btn-primary my-3">Crear película</button>
+        </form>
+    </div>
+    <hr>
+
+    <div class="container mt-5">
+        <h2>Lista de actores</h2>
+        <li><a href=/actorout/actors>Listar actores</a></li>
+        <li><a href=/actorout/countActors>Contar actores</a></li>
+    </div>
+    <hr>
+
+    <div class="container mt-5">
+        <form action="{{ route('listActorsByDecade')}}" method="GET">
+            @csrf
+            <h2>Buscar actores por criterio</h2>
+            <label for="decade" class="form-label">Década de nacimiento</label>
+            <select name="year" id="decade" class="form-select ml-2" onchange="this.form.action='{{ route('listActorsByDecade', '') }}/' + this.value;">
+                <option value="">Selecciona un año</option>
+                <option value="1980" {{ request('year') == '1980' ? 'selected' : '' }}>1980-1989</option>
+                <option value="1990" {{ request('year') == '1990' ? 'selected' : '' }}>1990-1999</option>
+                <option value="2000" {{ request('year') == '2000' ? 'selected' : '' }}>2000-2009</option>
+                <option value="2010" {{ request('year') == '2010' ? 'selected' : '' }}>2010-2019</option>
+                <option value="2020" {{ request('year') == '2020' ? 'selected' : '' }}>2020-2029</option>
+            </select>
+            <button type="submit" class="btn btn-primary my-3 ml-3">Buscar</button>
         </form>
     </div>
 @endsection
