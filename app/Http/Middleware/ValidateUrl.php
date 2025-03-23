@@ -23,6 +23,6 @@ class ValidateUrl
             return $next($request);
         } else {
             return response(view('welcome', ["status" => "URL de la imagen incorrecta"])); //status =>... headers
-        }      
+        }
     }
 }

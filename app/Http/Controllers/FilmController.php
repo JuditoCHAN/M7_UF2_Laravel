@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FilmController extends Controller
 {
@@ -11,20 +12,38 @@ class FilmController extends Controller
      * Read films from storage
      */
     public static function readFilms(): array {
+        // leemos los datos del fichero JSON
         $films = Storage::json('/public/films.json');
-        return isset($films) ? $films : [];
+
+        // leemos los datos de la base de datos
+        try {
+            $filmsDB = DB::table('films')->get()->toArray(); // devuelve array de objetos stdClass
+        } catch (\Exception $e) {
+            $filmsDB = [];
+        }
+
+        // hay que convertir $filmsDB en un array asociativo
+        $filmsDBInArray = [];
+        foreach($filmsDB as $film) {
+            $filmsDBInArray[] = (array) $film;
+        }
+
+        // combinamos los datos del fichero JSON con los de la base de datos
+        return array_merge($films ?? [], $filmsDBInArray); // si $films es null, devolvemos un array vacío combinado con $filmsDBInArray
     }
+
+
     /**
-     * List films older than input year 
+     * List films older than input year
      * if year is not infomed 2000 year will be used as criteria
      */
     public function listOldFilms($year = null)
-    {        
+    {
         $old_films = [];
         if (is_null($year))
         $year = 2000;
-    
-        $title = "Listado de Pelis Antiguas (Antes de $year)";    
+
+        $title = "Listado de Pelis Antiguas (Antes de $year)";
         $films = FilmController::readFilms();
 
         foreach ($films as $film) {
@@ -34,6 +53,8 @@ class FilmController extends Controller
         }
         return view('films.list', ["films" => $old_films, "title" => $title]);
     }
+
+
     /**
      * List films younger than input year
      * if year is not infomed 2000 year will be used as criteria
@@ -53,17 +74,17 @@ class FilmController extends Controller
         }
         return view('films.list', ["films" => $new_films, "title" => $title]);
     }
+
+
     /**
      * Lista TODAS las películas o filtra x año o categoría.
      */
     public function listFilms($year = null, $genre = null)
     {
-        // dd($year);
-        // dd($genre);
         $films_filtered = [];
-
         $title = "Listado de todas las pelis";
         $films = FilmController::readFilms();
+        //dd($films);
 
         //if year and genre are null
         if (is_null($year) && is_null($genre))
@@ -88,7 +109,6 @@ class FilmController extends Controller
 
     public function listFilmsByGenre($genre = null) {
         $films_filtered = [];
-
         $title = "Listado de todas las pelis";
         $films = FilmController::readFilms();
 
@@ -106,7 +126,7 @@ class FilmController extends Controller
         return view("films.list", ["films" => $films_filtered, "title" => $title]);
     }
 
-    
+
     public function listFilmsByYear($year = null) {
         $films_filtered = [];
 
@@ -142,17 +162,22 @@ class FilmController extends Controller
 
     public function countFilms() {
         $title = "Número total de películas";
-        $films = FilmController::readFilms();
+        // $films = FilmController::readFilms();
+        // $numFilms = count($films);
 
-        $numFilms = count($films);
-        
+        try {
+            $numFilms = DB::table('films')->count();
+        } catch (\Exception $e) {
+            $numFilms = 0;
+        }
+
         return view("films.count", ["title" => $title, "numFilms" => $numFilms]);
     }
 
 
     public static function isFilm($filmName): bool {
         $films = FilmController::readFilms();
-        
+
         foreach($films as $film) {
             if($film['name'] === $filmName) { //si ya hay una peli con ese nombre
                 return true;
@@ -165,26 +190,43 @@ class FilmController extends Controller
     public function createFilm(Request $request) {
         $films = FilmController::readFilms();
 
-        $newFilm = 
-        ['name' => $request->input("name"),
-        'year' => $request->input("year"),
-        'genre' => $request->input("genre"),
-        'country' => $request->input("country"),
-        'duration' => $request->input("duration"),
-        'img_url' => $request->input("img_url")
+        $newFilm =[
+            'name' => $request->input("name"),
+            'year' => $request->input("year"),
+            'genre' => $request->input("genre"),
+            'country' => $request->input("country"),'duration' => $request->input("duration"),'img_url' => $request->input("img_url")
         ];
 
-        if(FilmController::isFilm($newFilm['name'])) { //si ya existe con ese nombre
-            return view("welcome", ["status" => "Ya existe una peli con ese nombre"]);
+        // si ya existe una película con ese nombre
+        if(FilmController::isFilm($newFilm['name'])) {
+            return view("welcome", ["status" => "Ya existe una película con ese nombre"]);
         } else {
-            //añadimos la peli y mostramos todas las pelis
-            $films[] = $newFilm;
-            $status = Storage::put('/public/films.json', json_encode($films));
+            // TODO: Verificamos el valor de la flag desde el archivo de configuración film.php
+            $insertInDB = config('film.insert_in_db');
 
-            if($status) {
-                return redirect()->action('App\Http\Controllers\FilmController@listFilms');
+            if($insertInDB) {
+                // añadimos la peli a la base de datos
+                try {
+                    DB::table('films')->insert($newFilm);
+                    return redirect()->action('App\Http\Controllers\FilmController@listFilms');
+                } catch(\Exception $e) {
+                    return view("welcome", ["status" => "Error al añadir la peli a la base de datos: " . $e->getMessage()]);
+                }
+
             } else {
-                return view("welcome", ["status" => "Error al añadir la peli"]);
+                try {
+                    // añadimos la peli al fichero JSON
+                    $films[] = $newFilm;
+                    $status = Storage::put('/public/films.json', json_encode($films));
+
+                    if($status) {
+                        return redirect()->action('App\Http\Controllers\FilmController@listFilms');
+                    } else {
+                        return view("welcome", ["status" => "Error al añadir la peli al fichero"]);
+                    }
+                } catch(\Exception $e) {
+                    return view("welcome", ["status" => "Error al añadir la peli al fichero: " . $e->getMessage()]);
+                }
             }
         }
     }
