@@ -95,4 +95,28 @@ class ActorController extends Controller
             ], 500); // código 500 -> error en el servidor
         }
     }
+
+
+    public function index() {
+        try {
+            $actors = DB::table('actors')->get()->toArray(); // devuelve array de objetos stdClass
+        } catch (\Exception $e) {
+            $actors = [];
+        }
+
+        // hay que convertir $actors (array de stdClass) en un array asociativo
+        $actorsDBInArray = [];
+        foreach($actors as $actor) {
+            $actorsDBInArray[] = (array) $actor;
+        }
+
+        if(count($actorsDBInArray) === 0) {
+            return response()->json([
+                'action' => 'get',
+                'status' => 'no actors found'
+            ], 200);
+        }
+
+        return response()->json($actorsDBInArray, 200);
+    }
 }
