@@ -79,7 +79,7 @@
             @csrf
             <h2>Buscar actores por criterio</h2>
             <label for="decade" class="form-label">Década de nacimiento</label>
-            <select name="year" id="decade" class="form-select ml-2" onchange="this.form.action='{{ route('listActorsByDecade', '') }}/' + this.value;">
+            <select name="year" id="decade" class="form-select ml-2" onchange="this.form.action='{{ route('listActorsByDecade', '') }}/' + this.value;" required>
                 <option value="">Selecciona un año</option>
                 <option value="1980" {{ request('year') == '1980' ? 'selected' : '' }}>1980-1989</option>
                 <option value="1990" {{ request('year') == '1990' ? 'selected' : '' }}>1990-1999</option>
