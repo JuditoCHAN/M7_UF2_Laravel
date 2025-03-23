@@ -162,9 +162,14 @@ class FilmController extends Controller
 
     public function countFilms() {
         $title = "Número total de películas";
-        $films = FilmController::readFilms();
+        // $films = FilmController::readFilms();
+        // $numFilms = count($films);
 
-        $numFilms = count($films);
+        try {
+            $numFilms = DB::table('films')->count();
+        } catch (\Exception $e) {
+            $numFilms = 0;
+        }
 
         return view("films.count", ["title" => $title, "numFilms" => $numFilms]);
     }
