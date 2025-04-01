@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Film;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,24 +14,13 @@ class FilmController extends Controller
      * Read films from storage
      */
     public static function readFilms(): array {
-        // leemos los datos del fichero JSON
-        $films = Storage::json('/public/films.json');
-
         // leemos los datos de la base de datos
         try {
-            $filmsDB = DB::table('films')->get()->toArray(); // devuelve array de objetos stdClass
+            $filmsDB = Film::all()->toArray(); // array de instancias de Film
         } catch (\Exception $e) {
             $filmsDB = [];
         }
-
-        // hay que convertir $filmsDB en un array asociativo
-        $filmsDBInArray = [];
-        foreach($filmsDB as $film) {
-            $filmsDBInArray[] = (array) $film;
-        }
-
-        // combinamos los datos del fichero JSON con los de la base de datos
-        return array_merge($films ?? [], $filmsDBInArray); // si $films es null, devolvemos un array vacío combinado con $filmsDBInArray
+        return $filmsDB;
     }
 
 
@@ -162,14 +153,8 @@ class FilmController extends Controller
 
     public function countFilms() {
         $title = "Número total de películas";
-        // $films = FilmController::readFilms();
-        // $numFilms = count($films);
-
-        try {
-            $numFilms = DB::table('films')->count();
-        } catch (\Exception $e) {
-            $numFilms = 0;
-        }
+        $films = FilmController::readFilms();
+        $numFilms = count($films);
 
         return view("films.count", ["title" => $title, "numFilms" => $numFilms]);
     }
@@ -194,7 +179,9 @@ class FilmController extends Controller
             'name' => $request->input("name"),
             'year' => $request->input("year"),
             'genre' => $request->input("genre"),
-            'country' => $request->input("country"),'duration' => $request->input("duration"),'img_url' => $request->input("img_url")
+            'country' => $request->input("country"),
+            'duration' => $request->input("duration"),
+            'img_url' => $request->input("img_url")
         ];
 
         // si ya existe una película con ese nombre
@@ -207,7 +194,8 @@ class FilmController extends Controller
             if($insertInDB) {
                 // añadimos la peli a la base de datos
                 try {
-                    DB::table('films')->insert($newFilm);
+                    //Film::create(arrayAsociativo) o instanciaDelModelo->save()
+                    Film::create($newFilm);
                     return redirect()->action('App\Http\Controllers\FilmController@listFilms');
                 } catch(\Exception $e) {
                     return view("welcome", ["status" => "Error al añadir la peli a la base de datos: " . $e->getMessage()]);
