@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use App\Http\Controllers\ActorController;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Film extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'year',
+        'genre',
+        'country',
+        'duration',
+        'img_url',
+    ];
+
+    public function actors() {
+        $this->belongsToMany(Actor::class);
+    }
+
+}
