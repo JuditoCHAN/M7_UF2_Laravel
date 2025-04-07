@@ -12,7 +12,7 @@ class Actor extends Model
     //crear $fillable
 
     public function films() {
-        $this->belongsToMany(Film::class);
+        return $this->belongsToMany(Film::class, 'films_actors', 'actor_id', 'film_id');
     }
 
 }

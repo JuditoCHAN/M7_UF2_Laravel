@@ -16,8 +16,8 @@ class FilmController extends Controller
      */
     public function index() {
         try {
-            //$filmsDB = Film::with('actors')->get();
-            return response()->json(Film::all());
+            $filmsDB = Film::with('actors')->get();
+            return response()->json($filmsDB);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error obtaining films with actors: ' . $e->getMessage()
