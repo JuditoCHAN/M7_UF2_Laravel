@@ -11,6 +11,22 @@ class FilmController extends Controller
 {
 
     /**
+    * Gets all films with their actors, returns a JSON
+     * @return void
+     */
+    public function index() {
+        try {
+            $filmsDB = Film::with('actors')->get();
+            return response()->json($filmsDB);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error obtaining films with actors: ' . $e->getMessage()
+            ], 200);
+        }
+    }
+
+
+    /**
      * Read films from storage
      */
     public static function readFilms(): array {
