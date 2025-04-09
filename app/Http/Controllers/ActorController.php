@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Actor;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -9,31 +11,25 @@ class ActorController extends Controller
 {
 
     /**
-     * Lista TODOS los actores o filtra x década.
+     * Lista TODOS los actores
      */
-    public function listActors($decade = null)
+    public function listActors()
     {
         $title = "Listado de todos los actores";
         try {
-            $actors = DB::table('actors')->get()->toArray(); // devuelve array de objetos stdClass
+            $actorsDB = Actor::all()->toArray();
         } catch (\Exception $e) {
-            $actors = [];
+            $actorsDB = [];
         }
 
-        // hay que convertir $actors (array de stdClass) en un array asociativo
-        $actorsDBInArray = [];
-        foreach($actors as $actor) {
-            $actorsDBInArray[] = (array) $actor;
-        }
-
-        return view('actors.list', ["actors" => $actorsDBInArray, "title" => $title]);
+        return view('actors.list', ["actors" => $actorsDB, "title" => $title]);
     }
 
 
     public function countActors() {
         $title = "Número total de actores";
         try {
-            $numActors = DB::table('actors')->count();
+            $numActors = Actor::count();
         } catch (\Exception $e) {
             $numActors = 0;
         }
@@ -53,30 +49,29 @@ class ActorController extends Controller
             $decadeEnd = $year + 9;
 
             try {
-                $actors = DB::table('actors')
-                ->whereBetween('birthdate', ["$decadeStart-01-01", "$decadeEnd-12-31"])
-                ->get()
-                ->toArray(); // devuelve array de objetos stdClass
+                $actorsDB = Actor::whereBetween('birthdate', ["$decadeStart-01-01", "$decadeEnd-12-31"])->get();
             } catch (\Exception $e) {
-                $actors = [];
+                $actorsDB = [];
             }
 
-            // hay que convertir $actors (array de stdClass) en un array asociativo
-            $actorsDBInArray = [];
-            foreach($actors as $actor) {
-                $actorsDBInArray[] = (array) $actor;
-            }
-
-            return view('actors.list', ["actors" => $actorsDBInArray, "title" => $title]);
+            return view('actors.list', ["actors" => $actorsDB, "title" => $title]);
         }
     }
 
 
     public function destroy($id) {
         try {
-            $actorDeleted = DB::table('actors')->where('id', $id)->delete(); // devuelve true si se elimina al menos una fila
+            $actor = Actor::find($id);
+            if(!$actor) {
+                return response()->json([
+                    'action' => 'delete',
+                    'status' => false,
+                    'error' => 'Actor not found'
+                ], 404); // código 404 -> no encontrado
+            }
 
-            if ($actorDeleted) {
+            $result = $actor->delete();
+            if ($result) {
                 return response()->json([
                     'action' => 'delete',
                     'status' => true
@@ -99,24 +94,18 @@ class ActorController extends Controller
 
     public function index() {
         try {
-            $actors = DB::table('actors')->get()->toArray(); // devuelve array de objetos stdClass
+            if(Actor::count() === 0) {
+                return response()->json([
+                    'action' => 'get',
+                    'status' => 'no actors found'
+                ], 200);
+            }
+
+            $actorsDB = Actor::all()->toArray();
         } catch (\Exception $e) {
-            $actors = [];
+            $actorsDB = ['action' => 'get actors', 'status' => 'error', 'error' => $e->getMessage()];
         }
 
-        // hay que convertir $actors (array de stdClass) en un array asociativo
-        $actorsDBInArray = [];
-        foreach($actors as $actor) {
-            $actorsDBInArray[] = (array) $actor;
-        }
-
-        if(count($actorsDBInArray) === 0) {
-            return response()->json([
-                'action' => 'get',
-                'status' => 'no actors found'
-            ], 200);
-        }
-
-        return response()->json($actorsDBInArray, 200);
+        return response()->json($actorsDB, 200);
     }
 }
