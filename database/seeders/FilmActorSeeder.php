@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Actor;
+use App\Models\Film;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -14,21 +16,23 @@ class FilmActorSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create();
+        // desactivamos restricciones de claves foráneas, limpiamos tablas y reactivamos restricciones:
+        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // DB::table('films_actors')->truncate();
+        // DB::table('films')->truncate();
+        // DB::table('actors')->truncate();
+        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        // elimina los datos existentes en la tabla films_actors
-        DB::table('films_actors')->truncate(); // truncate elimina registros de la tabla y reinicia contador autoincremental
+        // creamos 5 películas y 5 actores
+        $films = Film::factory()->count(5)->create();
+        $actors = Actor::factory()->count(5)->create();
 
-        $film_ids = DB::table('films')->pluck('id');
-        $actor_ids = DB::table('actors')->pluck('id');
-
-        for($i = 0; $i < 3; $i++) {
-            DB::table('films_actors')->insert([
-                'film_id' => $faker->randomElement($film_ids),
-                'actor_id'=> $faker->randomElement($actor_ids),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+        // asignamos entre 1 a 3 actores a cada película
+        foreach ($films as $film) {
+            $film->actors()->attach(
+                $actors->random(rand(1, 3))->pluck('id')->toArray(),
+                ['created_at' => now(), 'updated_at' => now()] // para que los timestamps no aparezcan vacíos
+            );
         }
     }
 }
