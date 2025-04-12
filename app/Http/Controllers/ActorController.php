@@ -101,7 +101,7 @@ class ActorController extends Controller
                 ], 200);
             }
 
-            $actorsDB = Actor::all()->toArray();
+            $actorsDB = Actor::with('films')->get();
         } catch (\Exception $e) {
             $actorsDB = ['action' => 'get actors', 'status' => 'error', 'error' => $e->getMessage()];
         }
