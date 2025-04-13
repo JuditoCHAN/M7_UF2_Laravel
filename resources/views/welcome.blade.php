@@ -7,15 +7,16 @@
 @endsection
 
 @section('content')
-    <h1 class="mt-4">Lista de películas</h1>
-    <ul>
-        <li><a href=/filmout/oldFilms>Pelis antiguas</a></li>
-        <li><a href=/filmout/newFilms>Pelis nuevas</a></li>
-        <li><a href=/filmout/films>Pelis</a></li>
-        <li><a href=/filmout/sortFilms>Pelis por año en orden descendiente</a></li>
-        <li><a href=/filmout/countFilms>Contar películas</a></li>
-    </ul>
-    <hr>
+    <div class="container mt-5 rounded py-3 listing-custom">
+        <h2 class="pb-3">Lista de películas</h2>
+        <ul>
+            <li><a href=/filmout/oldFilms>Antiguas</a></li>
+            <li><a href=/filmout/newFilms>Nuevas</a></li>
+            <li><a href=/filmout/films>Listado completo</a></li>
+            <li><a href=/filmout/sortFilms>Por año en orden descendiente</a></li>
+            <li><a href=/filmout/countFilms>Contador de películas</a></li>
+        </ul>
+    </div>
 
     @if (!empty($status))
         <div class="alert alert-danger">
@@ -23,8 +24,8 @@
         </div>
     @endif
 
-    <div class="container mt-5">
-        <h2>Crea una película</h2>
+    <div class="container mt-5 rounded py-3 form-custom">
+        <h2 class="pb-3">Crear una película</h2>
         <form action="{{ route('createFilm') }}" method="POST">
             @csrf
             <div class="mb-3">
@@ -65,19 +66,19 @@
             <button type="submit" class="btn btn-primary my-3">Crear película</button>
         </form>
     </div>
-    <hr>
 
-    <div class="container mt-5">
-        <h2>Lista de actores</h2>
-        <li><a href=/actorout/actors>Listar actores</a></li>
-        <li><a href=/actorout/countActors>Contar actores</a></li>
+    <div class="container mt-5 rounded py-3 listing-custom">
+        <h2 class="pb-3">Lista de actores</h2>
+        <ul>
+            <li><a href=/actorout/actors>Listar actores</a></li>
+            <li><a href=/actorout/countActors>Contar actores</a></li>
+        </ul>
     </div>
-    <hr>
 
-    <div class="container mt-5">
+    <div class="container mt-5 rounded py-3 form-custom">
         <form action="{{ route('listActorsByDecade')}}" method="GET">
             @csrf
-            <h2>Buscar actores por criterio</h2>
+            <h2 class="pb-3">Buscar actores por criterio</h2>
             <label for="decade" class="form-label">Década de nacimiento</label>
             <select name="year" id="decade" class="form-select ml-2" onchange="this.form.action='{{ route('listActorsByDecade', '') }}/' + this.value;" required>
                 <option value="">Selecciona un año</option>
@@ -87,7 +88,7 @@
                 <option value="2010" {{ request('year') == '2010' ? 'selected' : '' }}>2010-2019</option>
                 <option value="2020" {{ request('year') == '2020' ? 'selected' : '' }}>2020-2029</option>
             </select>
-            <button type="submit" class="btn btn-primary my-3 ml-3">Buscar</button>
+            <button type="submit" class="btn btn-primary ml-3">Buscar</button>
         </form>
     </div>
 @endsection

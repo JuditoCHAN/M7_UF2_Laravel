@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Peliculas')</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Add Bootstrap CSS link -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
@@ -17,35 +22,49 @@
             gap: 40px;
         }
 
-        .navbar-color-styles {
-            background: rgb(252,255,191);
-            background: linear-gradient(90deg, rgba(252,255,191,1) 7%, rgba(255,234,190,1) 39%, rgba(255,195,195,1) 88%);
-            border: 1px solid orange;
+        .navbar-custom, .footer-custom {
+            min-height: 4rem;
+            background-color: #192A51;
+            box-shadow: 5px 5px 5px lightblue;
+        }
+
+        body {
+            font-family: "Montserrat", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            background-color: #f5e6e860;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .form-custom {
+            background-color: #aaa1c884;
+        }
+
+        .listing-custom {
+            background-color: #d5c6e078;
+        }
+
+        .title-font {
+            font-family: "Winky Rough", cursive;
+            font-size: 2rem;
+            color: #fff;
         }
     </style>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
     @section('header')
     <header>
-        {{-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav mr-auto navbar-styles">
-                    <li><img src="{{ asset('img/img_header.png') }}" alt="Icono de cine" class="img-fluid" style="max-height: 60px;"></li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ route('welcome') }}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('listFilms') }}">Pelis</a>
-                    </li>
-                </ul>
-            </div>
-        </nav> --}}
-
-        <nav class="navbar navbar-expand-lg navbar-color-styles navbar-light">
-            <img src="{{ asset('img/img_header.png') }}" alt="Icono de cine" class="img-fluid" style="max-height: 70px; margin-right: 20px;">
-            <span class="navbar-brand">CinemaApp</span>
+        <nav class="navbar navbar-expand-lg navbar-color-styles navbar-dark navbar-custom">
+            <span class="navbar-brand">
+                <a class="nav-link title-font" href="{{ route('welcome') }}">CINEMA APP</a>
+            </span>
 
             <!-- Botón toggler para pantallas pequeñas -->
             <button class="navbar-toggler toggler-styles" type="button" data-toggle="collapse" data-target="#navbarContent"
@@ -55,12 +74,28 @@
 
             <!-- Contenedor colapsable del navbar -->
             <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav mr-auto ul-styles">
+                <ul class="navbar-nav ml-auto ul-styles">
                     <li class="nav-item active">
-                        <a class="nav-link" href="{{ route('welcome') }}">Inicio</a>
+                        <a class="nav-link" href="{{ route('welcome') }}">INICIO</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('listFilms') }}">Pelis</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">PELÍCULAS </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('listFilms') }}">Listado completo</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('oldFilms') }}">Antiguas</a></li>
+                            <li><a class="dropdown-item" href="{{ route('newFilms') }}">Nuevas</a></li>
+                            <li><a class="dropdown-item" href="{{ route('sortFilms') }}">En orden descendiente</a></li>
+                            <li><a class="dropdown-item" href="{{ route('countFilms') }}">Contador</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">ACTORES </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('listActors') }}">Listado completo</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ route('countActors') }}">Contador</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -75,9 +110,15 @@
     </main>
 
     <!-- Footer estático (no como el header) siempre se añadirá y no se puede modificar/ampliar en plantillas hijas-->
-    <footer class="bg-light py-3 mt-4">
+    <footer class="text-light py-4 mt-4 footer-custom">
         <div class="container text-center">
-            <img src="{{ asset('img/footer.png') }}" alt="Imagen de una entrada de cine con información de la app" class="img-fluid">
+            <h5 class="mb-2 title-font">CINEMA APP</h5>
+            <p class="mb-2">© {{ date('Y') }} Todos los derechos reservados.</p>
+            <div>
+                <a href="#" class="text-light mx-2"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-light mx-2"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
+            </div>
         </div>
     </footer>
 
