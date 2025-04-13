@@ -19,7 +19,7 @@
     </div>
 
     @if (!empty($status))
-        <div class="alert alert-danger">
+        <div class="alert alert-danger mt-5">
             {{ $status }}
         </div>
     @endif
